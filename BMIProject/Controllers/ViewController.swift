@@ -16,20 +16,28 @@ class ViewController: UIViewController {
     @IBOutlet weak var weightTextField: UITextField!
     
     @IBOutlet weak var calculateButton: UIButton!
+
+    // Model과 통신하기 위해 인스턴스 생성
+    var bmiManager = BMICalculatorManager()
     
-    var bmi: Double?
+
     
     // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
         makeUI()
+        figureUI()
         
     }
     
     func makeUI() {
         heightTextField.delegate = self
         weightTextField.delegate = self
+        
+    }
+    
+    func figureUI() {
         
         mainLabel.text = "키와 몸무게를 입력해 주세요"
         
@@ -39,17 +47,12 @@ class ViewController: UIViewController {
         
         heightTextField.placeholder = "cm단위로 입력해 주세요"
         weightTextField.placeholder = "kg단위로 입력해 주세요"
-        
     }
-
+    
+    // 버튼이 눌리면 자동으로 세그웨이가 실행되면서 아래 두 함수가 실행된다.
     @IBAction func calculateButtonTapped(_ sender: UIButton) {
-        
-        // BMI 결과값을 뽑아내기
-        guard let height = heightTextField.text,
-              let weight = weightTextField.text else { return }
-              
-        bmi = calculateBMI(height: height, weight: weight)
-        
+        print(#function)
+    
     }
     
     // 세그웨으로 넘어가게 할지 말지
@@ -73,11 +76,15 @@ class ViewController: UIViewController {
         
         if segue.identifier == "toSecondVC" {
             let secondVC = segue.destination as! SecondViewController
+            secondVC.modalPresentationStyle = .fullScreen
             
             // 계산된 BMI 결과값을 다음 화면으로 전달
-            secondVC.bmiNumber = self.bmi
-            secondVC.bmiColor = getBackgroundColor()
-            secondVC.adviceString = getBMIAdviceString()
+//            secondVC.bmiNumber = bmiManager.getBMIResult()
+//            secondVC.bmiColor = bmiManager.getBackgroundColor()
+//            secondVC.adviceString = bmiManager.getBMIAdviceString()
+            
+            // bmi 계산하고 다음 화면에 값 넘기기
+            secondVC.bmi = bmiManager.getBMI(height: heightTextField.text!, weight: weightTextField.text!)
         }
         
         // 다음 화면으로 가기전에 텍스트 필드 비우기
@@ -87,53 +94,7 @@ class ViewController: UIViewController {
     }
     
     
-    func calculateBMI(height: String, weight: String) -> Double {
-        
-        guard let h = Double(height), let w = Double(weight) else { return 0.0 }
-        var bmi = w / (h * h) * 10000
-        bmi = round(bmi * 10) / 10
-        
-        return bmi
-    }
     
-    func getBackgroundColor() -> UIColor {
-        guard let bmi = bmi else { return UIColor.black }
-        
-        switch bmi {
-            case ..<18.6:
-                    return UIColor(displayP3Red: 22/255, green: 231/255, blue: 207/255, alpha: 1)
-            case 18.6..<23.0:
-                return UIColor(displayP3Red: 212/255, green: 251/255, blue: 121/255, alpha: 1)
-            case 23.0..<25.0:
-                return UIColor(displayP3Red: 218/255, green: 127/255, blue: 163/255, alpha: 1)
-            case 25.0..<30.0:
-                return UIColor(displayP3Red: 255/255, green: 150/255, blue: 141/255, alpha: 1)
-            case 30.0...:
-                return UIColor(displayP3Red: 255/255, green: 100/255, blue: 78/255, alpha: 1)
-            default:
-                return UIColor.black
-        }
-    }
-    
-    func getBMIAdviceString() -> String {
-        guard let bmi = bmi else { return "" }
-        
-        switch bmi {
-        case ..<18.6:
-            return "저체중"
-        case 18.6..<23.0:
-            return "표준"
-        case 23.0..<25.0:
-            return "과체중"
-        case 25.0..<30.0:
-            return "중도비만"
-        case 30.0...:
-            return "고도비만"
-        default:
-            return ""
-        }
-        
-    }
     
 
     

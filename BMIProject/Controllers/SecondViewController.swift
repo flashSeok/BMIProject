@@ -16,35 +16,36 @@ class SecondViewController: UIViewController {
     @IBOutlet weak var adviceLabel: UILabel!
     @IBOutlet weak var backButton: UIButton!
     
-    var bmiNumber: Double?
-    var adviceString: String?
-    var bmiColor: UIColor?
+    var bmi: BMI?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        makeUI()
+        configureUI()
         
+        guard let bmi = bmi else { return }
+        
+        bmiNumberLabel.text = "\(bmi.value)"
+        bmiNumberLabel.backgroundColor = bmi.matchColor
+        adviceLabel.text = bmi.advice        
     }
     
-    func makeUI() {
+    func configureUI() {
         
         bmiNumberLabel.clipsToBounds = true
         bmiNumberLabel.layer.cornerRadius = 8
         bmiNumberLabel.backgroundColor = .gray
         
         backButton.setTitle("다시 계산하기", for: .normal)
-        
-        
         backButton.clipsToBounds = true
         backButton.layer.cornerRadius = 5
         
-        guard let bmiNumber = bmiNumber else { return }
+        guard let bmiNumber = bmi?.value else { return }
         bmiNumberLabel.text = String(bmiNumber)
         
-        adviceLabel.text = adviceString
-        bmiNumberLabel.backgroundColor = bmiColor
+        adviceLabel.text = bmi?.advice
+        bmiNumberLabel.backgroundColor = bmi?.matchColor
 
     }
 
@@ -52,9 +53,6 @@ class SecondViewController: UIViewController {
     @IBAction func backButtonTapped(_ sender: UIButton) {
         dismiss(animated: true, completion: nil)
     }
-    
-    
-    
-    
+
 
 }
